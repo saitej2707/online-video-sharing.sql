@@ -1,0 +1,218 @@
+Project Description:
+Consider an online video-sharing platform like YouTube which hosts tens of thousands of channels and crores of users.
+
+You have to analyse the data and provide meaningful insights on the type of content that drives engagement, users growth, and many more to all the stakeholders. Let’s roll our sleeves up for an insightful analysis!
+
+Database:
+The sample database consists of tables that store the information of users, channels, videos, genres and likes/dislikes. 
+
+
+Note:
+-channel_usertable stores the data of the channel_ids and their subscribers' user_ids.
+  First row in the table represents that the user with user_id = 1 is subscribed to the channel with channel_id = 100 at2020-12-10 10:30:45
+
+
+-Similarly, user_likestable stores the data of video_id and the user_ids who reacted to the video.
+
+-Similarly,video_genretable stores the data of video_id and the ids of the genres that the corresponding video belongs to.
+
+
+
+*Let’s dive in to analyze the in and outs of each part of the data. Here we go!*
+
+
+here below are the screenshots of the data/tables 
+which we are going to analyze
+
+![Screenshot_20230204_114513](https://user-images.githubusercontent.com/124420859/216752385-7c84ccd4-b803-4db5-8e6d-fd5785c09632.png)
+![Screenshot_20230204_114535](https://user-images.githubusercontent.com/124420859/216752388-8cb15e60-70b8-4ec0-b102-2274c643d63b.png)
+![Screenshot_20230204_114557](https://user-images.githubusercontent.com/124420859/216752390-059b2853-0fe4-4484-a338-dacea9825b6c.png)
+![Screenshot_20230204_114619](https://user-images.githubusercontent.com/124420859/216752393-6ea21e50-b2c2-4e48-b6de-5469176b132c.png)
+![Screenshot_20230204_114642](https://user-images.githubusercontent.com/124420859/216752394-fd750f31-229f-43e4-bd56-d44740ac0f8c.png)
+![Screenshot_20230204_114703](https://user-images.githubusercontent.com/124420859/216752397-97935949-555c-4a1c-b7b7-610fc7d997ec.png)
+![Screenshot_20230204_114720](https://user-images.githubusercontent.com/124420859/216752399-53ad20ca-0c4e-44e9-a1c8-4c2a7f13bfe0.png)
+
+
+
+
+
+
+
+/*-- 1) Get all the videos with more than 1 lakh views. --*/
+
+SELECT
+  *
+FROM
+  video
+WHERE
+  no_of_views > 100000
+ORDER BY
+  name ASC;
+  
+  
+  
+/*-- 2) Get videos from TEDx channel (id=353) with more than 50 thousand views. 
+Note:
+Sort the output in the descending order ofno_of_viewsand in the ascending order of videoname --*/
+
+SELECT
+  video_id,
+  name,
+  duration_in_secs,
+  no_of_views
+FROM
+  video
+WHERE
+  channel_id = 353
+  AND no_of_views > 50000
+ORDER BY
+  no_of_views DESC,
+  name ASC;
+  
+  
+/*-- 3) Get the top 10 most viewed videos till date. 
+Note:
+Sort the output in the descending order ofno_of_viewsandpublished_datetime --*/
+
+SELECT
+  name,
+  channel_id,
+  no_of_views
+FROM
+  video
+ORDER BY
+  no_of_views DESC,
+  published_datetime DESC
+LIMIT
+  10;
+  
+
+/* -- 4) Get all the recent movie trailers that have more than 1 lakh views.
+
+Note:
+Consider the videos that have "trailer" in theirnameas trailers.
+Sort the output in the descending order ofno_of_viewsandpublished_datetime --*/
+
+SELECT
+  name,
+  channel_id,
+  no_of_views,
+  published_datetime
+FROM
+  video
+WHERE
+  no_of_views > 100000
+  AND name LIKE "%trailer%"
+ORDER BY
+  no_of_views DESC,
+  published_datetime DESC;
+
+
+/* --5)Get all the videos that are released in the year 2018.
+Note:
+Sort the output in the descending order ofpublished_datetimeand then in the alphabetical order of name --*/
+
+SELECT
+  video_id,
+  name,
+  duration_in_secs,
+  no_of_views
+FROM
+  video
+WHERE
+  strftime("%Y", published_datetime) = "2018"
+ORDER BY
+  published_datetime DESC,
+  name;
+  
+
+/*--6) Get the distinct ids of videos that belong to the following genres. --*/
+
+SELECT
+  DISTINCT video_id
+FROM
+  video_genre
+WHERE
+  genre_id IN (201, 202, 203, 211)
+ORDER BY
+  video_id DESC;
+  
+
+/*-- 7) Get all the esport videos that crossed one lakh views and were released between 2018 and 2020.
+Note:
+Consider the videos that have "esport" in theirname as gaming videos.
+Sort the output in the descending order ofno_of_viewsandpublished_datetime --*/
+
+SELECT
+  name,
+  published_datetime,
+  no_of_views
+FROM
+  video
+WHERE
+  name LIKE "%esport%"
+  AND no_of_views > 100000
+  AND cast(strftime("%Y", published_datetime) AS integer) BETWEEN 2018
+  AND 2020
+ORDER BY
+  no_of_views DESC,
+  published_datetime DESC;
+  
+
+/*--8) Get the total number of channels in the database aschannels_count --*/
+
+SELECT
+  count(*) AS channels_count
+FROM
+  channel;
+  
+
+/*-- 9) Get the highest and least number of views for the videos in the database. --*/
+
+SELECT
+  max(no_of_views) AS highest_number_of_views,
+  min(no_of_views) AS least_number_of_views
+FROM
+  video;
+  
+
+
+/*-- 10) Get the average number of views for the videos released by the "Single Shot" Channel (id = 373) --*/
+
+SELECT
+  avg(no_of_views) AS avg_views
+FROM
+  video
+WHERE
+  channel_id = 373;
+  
+
+/*--11) Get the total number of premium users in the platform aspremium_users_count --*/
+
+SELECT
+  sum(premium_membership) AS premium_users_count
+FROM
+  user;
+  
+
+/*-- 12) Get the number of male and female premium users in the platform.--*/
+
+SELECT
+  gender,
+  sum(premium_membership) AS total_users
+FROM
+  user
+GROUP BY
+  gender;
+
+
+
+
+
+
+
+
+
+
+
+
